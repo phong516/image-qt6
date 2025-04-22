@@ -23,7 +23,7 @@ image::image(QWidget *parent)
     QGroupBox * imageBox =  new QGroupBox("Image");
     QHBoxLayout * imageLayout = new QHBoxLayout(imageBox);
     QLabel * imageLabel = new QLabel(imageBox);
-    imageLabel->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    imageLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     imageLabel->setAlignment(Qt::AlignCenter);
     imageLayout->addWidget(imageLabel);
     imageBox->setLayout(imageLayout);
@@ -58,18 +58,17 @@ image::image(QWidget *parent)
     rightPanel->addWidget(modifyBox, 8);
     rightPanel->addWidget(outputBox, 1);
 
-
    // OPEN IMAGE
-    QString imageFileName;
-    connect(openButton, &QPushButton::clicked, this, [this, &imageFileName, imageLabel](){
-        imageFileName = QFileDialog::getOpenFileName(this, "Open Image", QDir::homePath(), "Images (*.png *.xpm *.jpg)");
+    QString * imageFileName = new QString();
+    connect(openButton, &QPushButton::clicked, this, [this, imageFileName, imageLabel](){
+        *imageFileName = QFileDialog::getOpenFileName(this, "Open Image", QDir::homePath(), "Images (*.png *.jpeg *.jpg)");
         //qInfo() << "Path: " << imageFileName;
-        if (imageFileName.isEmpty())
+        if (imageFileName->isEmpty())
             {
             qInfo("No file selected");
             return;
         }
-        QImageReader imageReader(imageFileName);
+        QImageReader imageReader(*imageFileName);
         if (!imageReader.canRead())
         {
             qWarning("Image file is invalid");
@@ -80,7 +79,7 @@ image::image(QWidget *parent)
         qInfo() << "imageLabel: " << imageLabel->size();
         if (imagePixmap.width() > imageLabel->width() || imagePixmap.height() > imageLabel->height())
         {
-            imagePixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            imagePixmap = imagePixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
             qInfo() << "imagePixmap: " << imagePixmap.size();
         }
         imageLabel->setPixmap(imagePixmap);
@@ -91,19 +90,4 @@ image::image(QWidget *parent)
 image::~image()
 {
 
-}
-
-QWidget * image::setInputBox()
-{
-    ;
-}
-
-QWidget * image::setModifyBox()
-{
-    ;
-}
-
-QWidget * image::setOutputBox()
-{
-    ;
 }

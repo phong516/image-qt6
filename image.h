@@ -10,9 +10,5 @@ class image : public QWidget
 public:
     image(QWidget *parent = nullptr);
     ~image();
-private:
-    QWidget * setInputBox();
-    QWidget * setModifyBox();
-    QWidget * setOutputBox();
 };
 #endif // IMAGE_H
