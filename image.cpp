@@ -1,15 +1,4 @@
 #include "image.h"
-#include <QImage>
-#include <QImageReader>
-#include <QImage>
-#include <QFileDialog>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QPushButton>
-#include <QLabel>
-#include <QScreen>
-#include <QPixmap>
 
 image::image(QWidget *parent)
     : QWidget(parent)
@@ -61,19 +50,6 @@ image::image(QWidget *parent)
    // OPEN IMAGE
     QString * imageFileName = new QString();
     connect(openButton, &QPushButton::clicked, this, [this, imageFileName, imageLabel](){
-        *imageFileName = QFileDialog::getOpenFileName(this, "Open Image", QDir::homePath(), "Images (*.png *.jpeg *.jpg)");
-        //qInfo() << "Path: " << imageFileName;
-        if (imageFileName->isEmpty())
-            {
-            qInfo("No file selected");
-            return;
-        }
-        QImageReader imageReader(*imageFileName);
-        if (!imageReader.canRead())
-        {
-            qWarning("Image file is invalid");
-            return;
-        }
         QPixmap imagePixmap = QPixmap::fromImageReader(&imageReader);
         qInfo() << "imagePixmap: " << imagePixmap.size();
         qInfo() << "imageLabel: " << imageLabel->size();
@@ -84,10 +60,55 @@ image::image(QWidget *parent)
         }
         imageLabel->setPixmap(imagePixmap);
 
-    });
+    };
 }
 
 image::~image()
 {
+
+}
+
+void image::setImage(QImage)
+{
+
+}
+
+void image::setImageReader(QImageReader)
+{
+
+}
+
+void image::setPixmap(QPixmap)
+{
+
+}
+
+void image::setFilepath(QString)
+{
+
+}
+
+void image::display(QPixmap)
+{
+
+}
+
+void image::slot_openImage()
+{
+        QString imageFileName = QFileDialog::getOpenFileName(this, "Open Image", QDir::homePath(), "Images (*.png *.jpeg *.jpg)");
+        //qInfo() << "Path: " << imageFileName;
+        if (imageFileName.isEmpty())
+        {
+            qInfo("No file selected");
+            return;
+        }
+        QImageReader imageReader(imageFileName);
+        if (!imageReader.canRead())
+        {
+            qWarning("Image file is invalid");
+            return;
+        }
+
+        setFilepath(imageFileName);
 
 }
