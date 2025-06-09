@@ -3,43 +3,43 @@
 image::image(QWidget *parent)
     : QWidget(parent)
 {
-    QHBoxLayout * mainLayout = new QHBoxLayout(this);
+    mainLayout = new QHBoxLayout(this);
 
     int screenWidth = QGuiApplication::primaryScreen()->availableGeometry().width();
     int screenHeight = QGuiApplication::primaryScreen()->availableGeometry().height();
     this->resize(screenWidth, screenHeight);
 
-    QGroupBox * imageBox =  new QGroupBox("Image");
-    QHBoxLayout * imageLayout = new QHBoxLayout(imageBox);
-    QLabel * imageLabel = new QLabel(imageBox);
+    imageBox =  new QGroupBox("Image");
+    imageLayout = new QHBoxLayout(imageBox);
+    imageLabel = new QLabel(imageBox);
     imageLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     imageLabel->setAlignment(Qt::AlignCenter);
     imageLayout->addWidget(imageLabel);
     imageBox->setLayout(imageLayout);
     mainLayout->addWidget(imageBox, 9);
 
-    QVBoxLayout * rightPanel = new QVBoxLayout();
+    rightPanel = new QVBoxLayout();
     mainLayout->addLayout(rightPanel, 1);
 
-    QGroupBox * inputBox = new QGroupBox("Input");
-    QVBoxLayout * inputLayout = new QVBoxLayout(inputBox);
-    QPushButton * openButton = new QPushButton("Open Image", inputBox);
+    inputBox = new QGroupBox("Input");
+    inputLayout = new QVBoxLayout(inputBox);
+    openButton = new QPushButton("Open Image", inputBox);
     inputLayout->addWidget(openButton);
     inputBox->setLayout(inputLayout);
 
-    QGroupBox * modifyBox = new QGroupBox("Modify");
-    QVBoxLayout * modifyLayout = new QVBoxLayout(modifyBox);
-    QPushButton * grayscaleButton = new QPushButton("GrayScale", modifyBox);
-    QPushButton * rgbButton = new QPushButton("RGB", modifyBox);
-    QPushButton * cmykButton = new QPushButton("CMYK", modifyBox);
+    modifyBox = new QGroupBox("Modify");
+    modifyLayout = new QVBoxLayout(modifyBox);
+    grayscaleButton = new QPushButton("GrayScale", modifyBox);
+    rgbButton = new QPushButton("RGB", modifyBox);
+    cmykButton = new QPushButton("CMYK", modifyBox);
     modifyLayout->addWidget(grayscaleButton);
     modifyLayout->addWidget(rgbButton);
     modifyLayout->addWidget(cmykButton);
     modifyBox->setLayout(modifyLayout);
 
-    QGroupBox * outputBox = new QGroupBox("Output");
-    QVBoxLayout * outputLayout = new QVBoxLayout(outputBox);
-    QPushButton * saveButton = new QPushButton("Save Image", outputBox);
+    outputBox = new QGroupBox("Output");
+    outputLayout = new QVBoxLayout(outputBox);
+    saveButton = new QPushButton("Save Image", outputBox);
     outputLayout->addWidget(saveButton);
     outputBox->setLayout(outputLayout);
 
@@ -48,47 +48,10 @@ image::image(QWidget *parent)
     rightPanel->addWidget(outputBox, 1);
 
    // OPEN IMAGE
-    QString * imageFileName = new QString();
-    connect(openButton, &QPushButton::clicked, this, [this, imageFileName, imageLabel](){
-        QPixmap imagePixmap = QPixmap::fromImageReader(&imageReader);
-        qInfo() << "imagePixmap: " << imagePixmap.size();
-        qInfo() << "imageLabel: " << imageLabel->size();
-        if (imagePixmap.width() > imageLabel->width() || imagePixmap.height() > imageLabel->height())
-        {
-            imagePixmap = imagePixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-            qInfo() << "imagePixmap: " << imagePixmap.size();
-        }
-        imageLabel->setPixmap(imagePixmap);
-
-    };
+    connect(openButton, &QPushButton::clicked, this , &image::slot_openImage);
 }
 
 image::~image()
-{
-
-}
-
-void image::setImage(QImage)
-{
-
-}
-
-void image::setImageReader(QImageReader)
-{
-
-}
-
-void image::setPixmap(QPixmap)
-{
-
-}
-
-void image::setFilepath(QString)
-{
-
-}
-
-void image::display(QPixmap)
 {
 
 }
@@ -109,6 +72,18 @@ void image::slot_openImage()
             return;
         }
 
-        setFilepath(imageFileName);
+        QPixmap imagePixmap = QPixmap::fromImageReader(&imageReader);
+        //qInfo() << "imagePixmap: " << imagePixmap.size();
+        //qInfo() << "imageLabel: " << imageLabel->size();
+        if (imagePixmap.width() > imageLabel->width() || imagePixmap.height() > imageLabel->height())
+        {
+            imagePixmap = imagePixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        //    qInfo() << "imagePixmap: " << imagePixmap.size();
+        }
+        imageLabel->setPixmap(imagePixmap);
+}
+
+void image::slot_modifyImage(modifyMode)
+{
 
 }

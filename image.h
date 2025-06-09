@@ -29,22 +29,26 @@ class image : public QWidget
 public:
     image(QWidget *parent = nullptr);
     ~image();
-    QImage *getPr_image() const;
-    void setPr_image(QImage *newPr_image);
-    QImageReader *getPr_imageReader() const;
-    void setPr_imageReader(QImageReader *newPr_imageReader);
-    QPixmap *getPr_pixmap() const;
-    void setPr_pixmap(QPixmap *newPr_pixmap);
-    QString *getPr_filepath() const;
-    void setPr_filepath(QString *newPr_filepath);
 
 private:
-    QImage * pr_image = new QImage();
-    QImageReader * pr_imageReader = new QImageReader();
-    QPixmap * pr_pixmap = new QPixmap();
-    QString * pr_filepath = new QString();
-
-
+    QImage * pr_image;
+    QPixmap * pr_pixmap;
+    QHBoxLayout * mainLayout;
+    QGroupBox * imageBox       ;
+    QHBoxLayout * imageLayout  ;
+    QLabel * imageLabel        ;
+    QVBoxLayout * rightPanel   ;
+    QGroupBox * inputBox       ;
+    QVBoxLayout * inputLayout  ;
+    QPushButton * openButton   ;
+    QGroupBox * modifyBox      ;
+    QVBoxLayout * modifyLayout ;
+    QPushButton * grayscaleButton;
+    QPushButton * rgbButton    ;
+    QPushButton * cmykButton   ;
+    QGroupBox * outputBox      ;
+    QVBoxLayout * outputLayout ;
+    QPushButton * saveButton   ;
 
 signals:
     void signal_modify(modifyMode);
