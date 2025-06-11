@@ -32,7 +32,6 @@ public:
 
 private:
     QImage * pr_image;
-    QPixmap * pr_pixmap;
     QHBoxLayout * mainLayout;
     QGroupBox * imageBox       ;
     QHBoxLayout * imageLayout  ;
@@ -43,6 +42,7 @@ private:
     QPushButton * openButton   ;
     QGroupBox * modifyBox      ;
     QVBoxLayout * modifyLayout ;
+    QPushButton * revertButton;
     QPushButton * grayscaleButton;
     QPushButton * rgbButton    ;
     QPushButton * cmykButton   ;
@@ -50,11 +50,11 @@ private:
     QVBoxLayout * outputLayout ;
     QPushButton * saveButton   ;
 
-signals:
-    void signal_modify(modifyMode);
+    void display(QImage *);
 
 private slots:
     void slot_openImage();
     void slot_modifyImage(modifyMode);
+    void slot_saveImage();
 };
 #endif // IMAGE_H

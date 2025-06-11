@@ -29,9 +29,11 @@ image::image(QWidget *parent)
 
     modifyBox = new QGroupBox("Modify");
     modifyLayout = new QVBoxLayout(modifyBox);
+    revertButton = new QPushButton("Revert", modifyBox);
     grayscaleButton = new QPushButton("GrayScale", modifyBox);
     rgbButton = new QPushButton("RGB", modifyBox);
     cmykButton = new QPushButton("CMYK", modifyBox);
+    modifyLayout->addWidget(revertButton);
     modifyLayout->addWidget(grayscaleButton);
     modifyLayout->addWidget(rgbButton);
     modifyLayout->addWidget(cmykButton);
@@ -49,11 +51,31 @@ image::image(QWidget *parent)
 
    // OPEN IMAGE
     connect(openButton, &QPushButton::clicked, this , &image::slot_openImage);
+
+    connect(revertButton, &QPushButton::clicked, this, [=]() {slot_modifyImage(modifyMode::raw);});
+    connect(grayscaleButton, &QPushButton::clicked, this, [=]() {slot_modifyImage(modifyMode::grayscale);});
+    connect(rgbButton, &QPushButton::clicked, this, [=]() {slot_modifyImage(modifyMode::rgb);});
+    connect(cmykButton, &QPushButton::clicked, this, [=]() {slot_modifyImage(modifyMode::cmyk);});
+
+    connect(saveButton, &QPushButton::clicked, this, &image::slot_saveImage);
 }
 
 image::~image()
 {
 
+}
+
+void image::display(QImage * image)
+{
+    QPixmap pixmap = QPixmap::fromImage(*image);
+        //qInfo() << "pixmap: " << pixmap.size();
+        //qInfo() << "imageLabel: " << imageLabel->size();
+        if (pixmap.width() > imageLabel->width() || pixmap.height() > imageLabel->height())
+        {
+            pixmap = pixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        //    qInfo() << "pixmap: " << pixmap.size();
+        }
+        imageLabel->setPixmap(pixmap);
 }
 
 void image::slot_openImage()
@@ -65,25 +87,53 @@ void image::slot_openImage()
             qInfo("No file selected");
             return;
         }
-        QImageReader imageReader(imageFileName);
-        if (!imageReader.canRead())
+
+        QImage image(imageFileName);
+        if (image.isNull())
         {
             qWarning("Image file is invalid");
             return;
         }
 
-        QPixmap imagePixmap = QPixmap::fromImageReader(&imageReader);
-        //qInfo() << "imagePixmap: " << imagePixmap.size();
-        //qInfo() << "imageLabel: " << imageLabel->size();
-        if (imagePixmap.width() > imageLabel->width() || imagePixmap.height() > imageLabel->height())
+        if (pr_image != nullptr)
         {
-            imagePixmap = imagePixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        //    qInfo() << "imagePixmap: " << imagePixmap.size();
+            delete pr_image;
         }
-        imageLabel->setPixmap(imagePixmap);
+        pr_image = new QImage(image);
+
+        display(pr_image);
 }
 
-void image::slot_modifyImage(modifyMode)
+void image::slot_saveImage()
 {
-
+    QString saveFileName = QFileDialog::getSaveFileName(this, "Save Image", QDir::homePath(), "Images (*.png *.jpeg *.jpg");
+    imageLabel->pixmap().save(saveFileName);
 }
+void image::slot_modifyImage(modifyMode mode)
+{
+    if (imageLabel->pixmap().isNull())
+    {
+        return;
+    }
+    QImage modifiedImage;
+    QImage::Format format;
+    switch (mode)
+    {
+    case modifyMode::raw:
+        display(pr_image);
+        return;
+    case modifyMode::grayscale:
+        format = QImage::Format_Grayscale8;
+        break;
+    case modifyMode::rgb:
+        format = QImage::Format_RGB16;
+        break;
+    case modifyMode::cmyk:
+        format = QImage::Format_CMYK8888;
+        break;
+    }
+
+    modifiedImage = pr_image->convertToFormat(format);
+    display(&modifiedImage);
+}
+
