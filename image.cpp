@@ -70,57 +70,69 @@ void image::display(QImage * image)
     QPixmap pixmap = QPixmap::fromImage(*image);
         //qInfo() << "pixmap: " << pixmap.size();
         //qInfo() << "imageLabel: " << imageLabel->size();
-        if (pixmap.width() > imageLabel->width() || pixmap.height() > imageLabel->height())
-        {
-            pixmap = pixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        //    qInfo() << "pixmap: " << pixmap.size();
-        }
-        imageLabel->setPixmap(pixmap);
+    if (pixmap.width() > imageLabel->width() || pixmap.height() > imageLabel->height())
+    {
+         pixmap = pixmap.scaled(imageLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+     //    qInfo() << "pixmap: " << pixmap.size();
+    }
+    imageLabel->setPixmap(pixmap);
 }
 
 void image::slot_openImage()
 {
-        QString imageFileName = QFileDialog::getOpenFileName(this, "Open Image", QDir::homePath(), "Images (*.png *.jpeg *.jpg)");
+        pr_imageFilename = QFileDialog::getOpenFileName(this, "Open Image", QDir::homePath(), "Images (*.png *.jpeg *.jpg)");
         //qInfo() << "Path: " << imageFileName;
-        if (imageFileName.isEmpty())
-        {
+        if (pr_imageFilename.isEmpty()) {
             qInfo("No file selected");
             return;
         }
 
-        QImage image(imageFileName);
+        QImage image(pr_imageFilename);
         if (image.isNull())
         {
             qWarning("Image file is invalid");
             return;
         }
 
-        if (pr_image != nullptr)
-        {
-            delete pr_image;
-        }
-        pr_image = new QImage(image);
-
-        display(pr_image);
+        setNewImage(pr_rawImage, image);
+        setNewImage(pr_modifiedImage, image);
+        display(pr_rawImage);
 }
 
 void image::slot_saveImage()
 {
-    QString saveFileName = QFileDialog::getSaveFileName(this, "Save Image", QDir::homePath(), "Images (*.png *.jpeg *.jpg");
-    imageLabel->pixmap().save(saveFileName);
+    if (imageLabel->pixmap().isNull())
+    {
+        return;
+    }
+    QString saveFileName = QFileDialog::getSaveFileName(this, "Save Image", pr_imageFilename);
+    if (!pr_modifiedImage->isNull())
+    {
+        pr_modifiedImage->save(saveFileName);
+    }
 }
+
+void image::setNewImage(QImage * &src, const QImage &des)
+{
+    if (src != nullptr)
+    {
+        delete src;
+        src = nullptr;
+    }
+    src = new QImage(des);
+}
+
 void image::slot_modifyImage(modifyMode mode)
 {
     if (imageLabel->pixmap().isNull())
     {
         return;
     }
-    QImage modifiedImage;
     QImage::Format format;
     switch (mode)
     {
     case modifyMode::raw:
-        display(pr_image);
+        display(pr_rawImage);
         return;
     case modifyMode::grayscale:
         format = QImage::Format_Grayscale8;
@@ -133,7 +145,6 @@ void image::slot_modifyImage(modifyMode mode)
         break;
     }
 
-    modifiedImage = pr_image->convertToFormat(format);
-    display(&modifiedImage);
+    setNewImage(pr_modifiedImage, pr_rawImage->convertToFormat(format));
+    display(pr_modifiedImage);
 }
-

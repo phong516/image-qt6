@@ -31,7 +31,9 @@ public:
     ~image();
 
 private:
-    QImage * pr_image;
+    QImage * pr_rawImage;
+    QImage * pr_modifiedImage;
+
     QHBoxLayout * mainLayout;
     QGroupBox * imageBox       ;
     QHBoxLayout * imageLayout  ;
@@ -50,11 +52,15 @@ private:
     QVBoxLayout * outputLayout ;
     QPushButton * saveButton   ;
 
+    QString pr_imageFilename;
+
     void display(QImage *);
 
 private slots:
     void slot_openImage();
-    void slot_modifyImage(modifyMode);
+    void slot_modifyImage(const modifyMode);
     void slot_saveImage();
+
+    void setNewImage(QImage * &, const QImage &);
 };
 #endif // IMAGE_H
